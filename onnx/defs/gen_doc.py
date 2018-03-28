@@ -73,17 +73,9 @@ def display_schema(schema, versions):
         s += '\n'
 
     # since version
-    s += '\n#### Versioning\n'
-    s += '\nThis operator is used if you are using version {} '.format(schema.since_version)
-    s += 'of {} until the next BC-breaking change to this operator; e.g., it will be used if your protobuf has:\n\n'.format(
-        display_domain(schema.domain))
-    s += '~~~~\n'
-    s += 'opset_import {\n'
-    s += '  version = {}\n'.format(schema.since_version)
-    if schema.domain:
-        s += "  domain = '{}'\n".format(schema.domain)
-    s += '}\n'
-    s += '~~~~\n'
+    s += '\n#### Version\n'
+    s += '\nThis version of the operator has been available since version {}'.format(schema.since_version)
+    s += ' of the \'{}\' operator set.\n'.format(schema.domain)
     if len(versions) > 1:
         # TODO: link to the Changelog.md
         s += '\nOther versions of this operator: {}\n'.format(
