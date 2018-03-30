@@ -89,7 +89,7 @@ def display_schema(schema, versions):
             s += '<dt><tt>{}</tt> : {}{}</dt>\n'.format(
                 attr.name,
                 display_attr_type(attr.type),
-                ' (required)' if attr.required else '')
+                ' (required)' if attr.required else ' (optional)')
             s += '<dd>{}</dd>\n'.format(attr.description)
         s += '</dl>\n'
 
