@@ -308,12 +308,13 @@ ONNX_OPERATOR_SCHEMA(LinearRegressor)
 ONNX_OPERATOR_SCHEMA(Normalizer)
 .SetDomain("ai.onnx.ml")
 .SetDoc(R"DOC(
-    Normalize the input.  There are three normalization modes,
-    which have the corresponding formulas:<br>
-<br><br>**TODO: This explanation of the formulas -- how do I read them?**<br>
-    Max: max(x_i)<br>
-    L1: z = ||x||_1 = \sum_{i=1}^{n} |x_i|<br>
-    L2: z = ||x||_2 = \sqrt{\sum_{i=1}^{n} x_i^2}<br>
+    Normalize the input.  There are three normalization modes, which have the corresponding formulas,
+    defined using element-wise infix operators '/' and '^' and tensor-wide functions 'max' and 'sum':<br>
+<br><br>
+    Max: Y = X / max(X)<br>
+    L1:  Y = X / sum(X)<br>
+    L2:  Y = sqrt(X^2 / sum(X^2)}<br><br>
+    In all modes, if the divisor is zero, Y == X.
 )DOC")
 .Input(0, "X", "Data to be encoded", "T")
 .Output(0, "Y", "encoded output data", "tensor(float)")
@@ -327,16 +328,16 @@ ONNX_OPERATOR_SCHEMA(OneHotEncoder)
 .SetDomain("ai.onnx.ml")
 .SetDoc(R"DOC(
     Replace each input element with an array of ones and zeros, where a single
-    one corresponds to the (zero-based) category that was passed in. The total category count 
-    will determine the length of the vector.<br>
+    one is placed at the index of the category that was passed in. The total category count 
+    will determine the sized of the extra dimension of the output array Y.<br>
     For example, if we pass a tensor with a single value of 4, and a category count of 8, 
     the output will be a tensor with ``[0,0,0,0,1,0,0,0]``.<br><br>
-    This operator assumes every input feature is of the same set of categories.<br><br>
+    This operator assumes every input feature is from the same set of categories.<br><br>
 	If the input is a tensor of float, int32, or double, the data will be cast
     to integers and the cats_int64s category list will be used for the lookups.
 )DOC")
-.Input(0, "X", "Data to be encoded", "T")
-.Output(0, "Y", "Encoded output data", "tensor(float)")
+.Input(0, "X", "Data to be encoded.", "T")
+.Output(0, "Y", "Encoded output data, having one more dimension than X.", "tensor(float)")
 .TypeConstraint("T", { "tensor(string)", "tensor(int64)","tensor(int32)", "tensor(float)","tensor(double)" }, "")
 .Attr("cats_int64s", "List of categories, ints.<br>One and only one of the 'cats_*' attributes must be defined.", AttributeProto::INTS, OPTIONAL)
 .Attr("cats_strings", "List of categories, strings.<br>One and only one of the 'cats_*' attributes must be defined.", AttributeProto::STRINGS, OPTIONAL)
