@@ -4,7 +4,7 @@
             Do not modify directly and instead edit operator definitions.*
 
 # ai.onnx.ml
-## Version 1 of operator set 'ai.onnx.ml'
+## Version 1 of the 'ai.onnx.ml' operator set
 ### <a name="ai.onnx.ml.ArrayFeatureExtractor-1"></a>**ai.onnx.ml.ArrayFeatureExtractor-1**</a>
 
   Select elements of the input tensor based on the indices passed.
@@ -463,12 +463,13 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 
 ### <a name="ai.onnx.ml.Normalizer-1"></a>**ai.onnx.ml.Normalizer-1**</a>
 
-  Normalize the input.  There are three normalization modes,
-      which have the corresponding formulas:<br>
-  <br><br>**TODO: This explanation of the formulas -- how do I read them?**<br>
-      Max: max(x_i)<br>
-      L1: z = ||x||_1 = \sum_{i=1}^{n} |x_i|<br>
-      L2: z = ||x||_2 = \sqrt{\sum_{i=1}^{n} x_i^2}<br>
+  Normalize the input.  There are three normalization modes, which have the corresponding formulas,
+      defined using element-wise infix operators '/' and '^' and tensor-wide functions 'max' and 'sum':<br>
+  <br><br>
+      Max: Y = X / max(X)<br>
+      L1:  Y = X / sum(X)<br>
+      L2:  Y = sqrt(X^2 / sum(X^2)}<br><br>
+      In all modes, if the divisor is zero, Y == X.
 
 #### Version
 
@@ -505,11 +506,11 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 ### <a name="ai.onnx.ml.OneHotEncoder-1"></a>**ai.onnx.ml.OneHotEncoder-1**</a>
 
   Replace each input element with an array of ones and zeros, where a single
-      one corresponds to the (zero-based) category that was passed in. The total category count 
-      will determine the length of the vector.<br>
+      one is placed at the index of the category that was passed in. The total category count 
+      will determine the sized of the extra dimension of the output array Y.<br>
       For example, if we pass a tensor with a single value of 4, and a category count of 8, 
       the output will be a tensor with ``[0,0,0,0,1,0,0,0]``.<br><br>
-      This operator assumes every input feature is of the same set of categories.<br><br>
+      This operator assumes every input feature is from the same set of categories.<br><br>
   	If the input is a tensor of float, int32, or double, the data will be cast
       to integers and the cats_int64s category list will be used for the lookups.
 
@@ -532,14 +533,14 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 
 <dl>
 <dt><tt>X</tt> : T</dt>
-<dd>Data to be encoded</dd>
+<dd>Data to be encoded.</dd>
 </dl>
 
 #### Outputs
 
 <dl>
 <dt><tt>Y</tt> : tensor(float)</dt>
-<dd>Encoded output data</dd>
+<dd>Encoded output data, having one more dimension than X.</dd>
 </dl>
 
 #### Type Constraints

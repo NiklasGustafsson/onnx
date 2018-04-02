@@ -46,7 +46,7 @@ def display_attr_type(v):
 
 def display_domain(domain):
     if domain:
-        return "operator set '{}'".format(domain)
+        return "the '{}' operator set".format(domain)
     else:
         return "the default ONNX operator set"
 
@@ -75,7 +75,7 @@ def display_schema(schema, versions):
     # since version
     s += '\n#### Version\n'
     s += '\nThis version of the operator has been available since version {}'.format(schema.since_version)
-    s += ' of the \'{}\' operator set.\n'.format(schema.domain)
+    s += ' of {}.\n'.format(display_domain(schema.domain))
     if len(versions) > 1:
         # TODO: link to the Changelog.md
         s += '\nOther versions of this operator: {}\n'.format(
