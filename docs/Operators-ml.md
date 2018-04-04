@@ -247,12 +247,9 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 
 ### <a name="ai.onnx.ml.FeatureVectorizer"></a><a name="ai.onnx.ml.featurevectorizer">**ai.onnx.ml.FeatureVectorizer**</a>
 
-  Concatenates input features into one continuous output.<br><br>
-      **TODO: Correct this explanation, because it refers to an attribute that does not exist:**<br>
-      Inputlist is a list of input feature names, inputdimensions is the size of each input feature.
-      Inputs will be written to the output in the order of the input arguments.<br><br>
-      All inputs are tensors of float. Any feature that is not a tensor of float should
-      be converted using either Cast or CastMap.
+  Concatenates input tensors into one continuous output.<br><br>
+      Inputs are copied to the output maintaining the order of the input arguments.<br><br>
+      All inputs must be integers or floats, while the output will be all floating point values.
 
 #### Version
 
@@ -283,22 +280,22 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 
 <dl>
 <dt><tt>T1</tt> : tensor(int32), tensor(int64), tensor(float), tensor(double)</dt>
-<dd> Allowed input types</dd>
+<dd></dd>
 <dt><tt>T2</tt> : tensor(float)</dt>
-<dd> Output data type</dd>
+<dd></dd>
 </dl>
 
 
 ### <a name="ai.onnx.ml.Imputer"></a><a name="ai.onnx.ml.imputer">**ai.onnx.ml.Imputer**</a>
 
   Replaces inputs that equal one value with another, leaving all other elements alone.<br><br>
-      This operator is typically used to replace missing values in situations where missing values have a canonical
-      representation, such as -1, 0, or some extreme value.<br><br>
+      This operator is typically used to replace missing values in situations where they have a canonical
+      representation, such as -1, 0, NaN, or some extreme value.<br><br>
       One and only one of imputed_value_floats or imputed_value_int64s should be defined -- floats if the input tensor
       holds floats, integers if the input tensor holds integers. The imputed values must all fit within the
       width of the tensor element type. One and only one of the replaced_value_float or replaced_value_int64 should be defined,
       which one depends on whether floats or integers are being processed.<br><br>
-      The imputed_value attribute length can be 1 element, or it can have one element per input feature. In other words, if the input tensor has the shape [*,F], then the length of the attribute array may be 1 or F. If it is 1, then it is broadcast along the last dimension and applied to each feature.
+      The imputed_value attribute length can be 1 element, or it can have one element per input feature.<br>In other words, if the input tensor has the shape [*,F], then the length of the attribute array may be 1 or F. If it is 1, then it is broadcast along the last dimension and applied to each feature.
 
 #### Version
 
@@ -607,7 +604,7 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 <dt><tt>prob_a</tt> : list of floats</dt>
 <dd>First set of probability coefficients</dd>
 <dt><tt>prob_b</tt> : list of floats</dt>
-<dd>Second set of probability coefficients. This array must be same size as prob_a.<br>If these are provided then output Z are probability estimates, otherwise raw scores.</dd>
+<dd>Second set of probability coefficients. This array must be same size as prob_a.<br>If these are provided then output Z are probability estimates, otherwise they are raw scores.</dd>
 <dt><tt>rho</tt> : list of floats (required)</dt>
 <dd></dd>
 <dt><tt>support_vectors</tt> : list of floats (required)</dt>
@@ -629,7 +626,7 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 <dt><tt>Y</tt> : T2</dt>
 <dd>Classification outputs (one class per example)</dd>
 <dt><tt>Z</tt> : tensor(float)</dt>
-<dd>Class scores (one per class per example), if prob_a and prob_b are provided they are probabilities for each class otherwise they are raw scores.</dd>
+<dd>Class scores (one per class per example), if prob_a and prob_b are provided they are probabilities for each class, otherwise they are raw scores.</dd>
 </dl>
 
 #### Type Constraints
@@ -772,9 +769,9 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 <dt><tt>nodes_hitrates</tt> : list of floats</dt>
 <dd>Popularity of each node, used for performance and may be omitted.</dd>
 <dt><tt>nodes_missing_value_tracks_true</tt> : list of ints</dt>
-<dd>For each node, decide if the value is missing (NaN) then use true branch.<br>If undefined, the default is 'false' for all nodes.</dd>
+<dd>For each node, define what to do in the presence of a missing value: if a value is missing (NaN), use the 'true' or 'false' branch based on the value in this array.<br>This attribute may be left undefined, and the defalt value is false (0) for all nodes.</dd>
 <dt><tt>nodes_modes</tt> : list of strings</dt>
-<dd>Defining the node kind, which implies its behavior. <br>One of 'BRANCH_LEQ', 'BRANCH_LT', 'BRANCH_GTE', 'BRANCH_GT', 'BRANCH_EQ', 'BRANCH_NEQ', 'LEAF'</dd>
+<dd>The node kind, that is, the comparison to make at the node. There is no comparison to make at a leaf node.<br>One of 'BRANCH_LEQ', 'BRANCH_LT', 'BRANCH_GTE', 'BRANCH_GT', 'BRANCH_EQ', 'BRANCH_NEQ', 'LEAF'</dd>
 <dt><tt>nodes_nodeids</tt> : list of ints</dt>
 <dd>Node id for each node. Ids may restart at zero for each tree, but it not required to.</dd>
 <dt><tt>nodes_treeids</tt> : list of ints</dt>
@@ -846,9 +843,9 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
 <dt><tt>nodes_hitrates</tt> : list of floats</dt>
 <dd>Popularity of each node, used for performance and may be omitted.</dd>
 <dt><tt>nodes_missing_value_tracks_true</tt> : list of ints</dt>
-<dd>For each node, decide if the value is missing (NaN) then use true branch. This field can be left unset and will assume false for all nodes</dd>
+<dd>For each node, define what to do in the presence of a missing value: if a value is missing (NaN), use the 'true' or 'false' branch based on the value in this array.<br>This attribute may be left undefined, and the defalt value is false (0) for all nodes.</dd>
 <dt><tt>nodes_modes</tt> : list of strings</dt>
-<dd>Defining the node kind, which implies its behavior. <br>One of 'BRANCH_LEQ', 'BRANCH_LT', 'BRANCH_GTE', 'BRANCH_GT', 'BRANCH_EQ', 'BRANCH_NEQ', 'LEAF'</dd>
+<dd>The node kind, that is, the comparison to make at the node. There is no comparison to make at a leaf node.<br>One of 'BRANCH_LEQ', 'BRANCH_LT', 'BRANCH_GTE', 'BRANCH_GT', 'BRANCH_EQ', 'BRANCH_NEQ', 'LEAF'</dd>
 <dt><tt>nodes_nodeids</tt> : list of ints</dt>
 <dd>Node id for each node. Ids ids must restart at zero for each tree and increase sequentially.</dd>
 <dt><tt>nodes_treeids</tt> : list of ints</dt>
@@ -896,9 +893,7 @@ This version of the operator has been available since version 1 of the 'ai.onnx.
   Creates a map from the input and the attributes.<br><br>
       The values are provides by the input tensor, while the keys are specified by the attributes.
       Must provide keys in either classlabels_strings or classlabels_int64s (but not both).<br><br>
-      Input 0 may have a batch size larger than 1.<br><br>
-      Each input in a batch must be the size of the keys specified by the attributes.<br><br>
-      The order of the input and attributes determines the key-value mapping.
+      The columns of the tensor correspond one-by-one to the keys specified by the attributes. There must be as many columns as keys.<br><br>    
 
 #### Version
 
