@@ -150,6 +150,7 @@ it is equivalent to transpose()
 ### Value Retrieval
 
     get  (s: sequence<T>, i: int) : T
+    get  (s: sequence<T>, i: int...) : sequence<T>
 
     slice(s: sequence<T>, start: int, len: int=-1) : sequence<T>
     remove(s: sequence<T>, start: int, len: int=-1) : sequence<T>
@@ -183,7 +184,26 @@ The comparer function should return -1,0,1 in the usual fashion.
 
 ## Maps
 
-TBD
+### Basics
+
+    map(keys: sequence<S>, values: sequence<T>) : map<S,T>
+    
+    len(m: map<S,T>) : int
+    keys(m: map<S,T>) : sequence<S>
+    values(m: map<S,T>) : sequence<T>
+    contains(m: map<S,T>, key: S) : boolean
+
+### Value Retrieval
+
+    get(m: map<S,T>, key: S) : T
+    get(m: map<S,T>, key: S...) : sequence<T>
+
+### Adding / Removing Values
+
+    add(m: map<S,T>, key: S, value: T) : map<S,T>
+    join(maps: map<S,T>...) : map<S,T>
+    join(maps: sequence<map<S,T>>) : map<S,T>
+    remove(m: map<S,T>, key: S...) : map<S,T>
 
 ## Dates and Time
 
