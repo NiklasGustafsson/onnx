@@ -121,26 +121,6 @@ The output collection has the same shape as the inputs.
     zipmap(x: map<R,S>,    y: map<R,T>,    tfrm: (S,T)->U) : map<S,U>
 
 
-## Tensors
-
-### Dimensions
-
-Get the total number of elements, or the size of each dimension for a given tensor.
-
-    len(t: tensor<T>) : int
-    dims(t: tensor<T>) : sequence<int>
-
-### Transpose & Permute
-
-transpose will flip the row / column orientation of 2-dimensional tensors.
-
-    transpose(input: tensor<T;[N,M]>) : tensor<T;[M,N]> 
-
-permute is matrix transposition generalized to N dimensions. For matrices,
-it is equivalent to transpose()
-
-    permute(input: tensor<T>, permutation: sequence<int>) : tensor<T>
-
 ## Sequences
 
 ### Basics
