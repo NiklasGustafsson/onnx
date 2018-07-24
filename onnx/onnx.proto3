@@ -102,6 +102,7 @@ message AttributeProto {
     GRAPHS = 10;
   }
 
+
   // The name field MUST be present for this version of the IR.
   string name = 1;           // namespace Attribute
  
@@ -136,6 +137,7 @@ message AttributeProto {
   repeated bytes strings = 9;         // list of UTF-8 strings
   repeated TensorProto tensors = 10;  // list of tensors
   repeated GraphProto graphs = 11;    // list of graph
+
 }
 
 // Defines information on value, including the name, the type, and
@@ -226,6 +228,7 @@ message ModelProto {
 
   // Named metadata values; keys should be distinct.
   repeated StringStringEntryProto metadata_props = 14;
+
 };
 
 // StringStringEntryProto follows the pattern for cross-proto-version maps.
@@ -234,6 +237,7 @@ message StringStringEntryProto {
   string key = 1;
   string value= 2;
 };
+
 
 // Graphs
 //
@@ -435,12 +439,28 @@ message TypeProto {
 // OperatorSets are uniquely identified by a (domain, opset_version) pair.
 message OperatorSetIdProto {
   // The domain of the operator set being identified.
-  // The empty string ("") or absence of this field implies the operator
-  // set that is defined as part of the ONNX specification.
+  // The absence of this field implies the operator set that is defined as part of the ONNX specification.
   // This field MUST be present in this version of the IR when referring to any other operator set.
   string domain = 1;
 
   // The version of the operator set being identified.
   // This field MUST be present in this version of the IR.
   int64 version = 2;
+}
+
+// External Models
+//
+// External models are uniquely identified by a (domain, name, opset_version) tuple. 
+//
+message ExternalModelProto {
+  // The domain of the operator set being identified.
+  // This field MUST be present in this version of the IR.
+  string domain = 1;
+
+  // The name of the model, that is, its main top-level graph.
+  string name = 2;
+
+  // The version of the model being identified.
+  // This field MUST be present in this version of the IR.
+  int64 version = 3;
 }

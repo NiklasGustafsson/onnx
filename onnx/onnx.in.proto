@@ -154,25 +154,45 @@ message AttributeProto {
 
   message SparseTensorAttribute {
 
+    message YaleFormatTensor {
+      // Sparse tensors are stored using the CSR (Yale) format, which is is described at: 
+      // https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format).
+      //
+      // The data type of the tensor elements are determined from the 'A' tensor, which holds the non-zero elements.
+      // Note that for the purposes of encoding, only the first dimension is compressed, the rest are treated as 
+      // if the tensor were of two dimensions.
+      optional TensorProto non_zero_elements = 1;
+
+      // This is the IA array, which stores the index in NZE of the
+      // first non-zero element in row i. If there are m rows, this
+      // array is m+1 elements long.
+      repeated int64 first_indices = 2;
+
+      // This is the JA array, which stores the column index of
+      // each element. It must be the same length as the NZE tensor.
+      repeated int64 column_indices = 3;
+    };
+
+    message OneHotTensor {
+
+      // For tensors that are rows (or a higher numbers of dimensions) of one-hot-encoded
+      // features, the linear indices where the 1-values are found are listed here.
+      repeated int64 linear_indices = 1;
+
+    };
+
     // The shape of the tensor.
-    repeated int64 dims = 4;
+    repeated int64 dims = 1;
 
-    // Sparse tensors are stored using the CSR (Yale) format, which is is described at: 
-    // https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_(CSR,_CRS_or_Yale_format).
-    //
-    // The data type of the tensor elements are determined from the 'A' tensor, which holds the non-zero elements.
-    // Note that for the purposes of encoding, only the first dimension is compressed, the rest are treated as 
-    // if the tensor were of two dimensions.
-    optional TensorProto non_zero_elements = 1;
+    // The data type of the tensor.
+    optional DataType data_type = 2;
 
-    // This is the IA array, which stores the index in NZE of the
-    // first non-zero element in row i. If there are m rows, this
-    // array is m+1 elements long.
-    repeated int64 first_indices = 2;
+    oneof value {
 
-    // This is the JA array, which stores the column index of
-    // each element. It must be the same length as the NZE tensor.
-    repeated int64 column_indices = 3;
+      YaleFormatTensor yale_format = 1;
+
+      OneHotTensor one_hot = 2;
+    };
 };
 // #endif
 
