@@ -86,7 +86,7 @@ Each model has the following components:
 |doc_string|string|A human-readable documentation for this model. Markdown is allowed.|
 |graph|Graph|The parameterized graph that is evaluated to execute the model.|
 |metadata_props|map<string,string>|Named metadata values; keys should be distinct.|
-|external_models|ExternalModel|A set of model identifiers `(domain,name, version)` for imported external models referenced within the current model.|
+|external_models|ExternalModel|A set of model identifiers `(domain,name,version)` for imported external models referenced within the current model.|
 
 Models MUST specify a domain and use reverse domain names based on the responsible organization's identity, the same convention that is traditionally used for naming Java packages.
  
@@ -213,7 +213,7 @@ Name|Type|Description
 |name|string|An optional name of the node, used for diagnostic purposes only.|
 |input|string[]|Names of the values used by the node to propagate input values to the node operator. It must refer to either a graph input or a node output.|
 |output|string[]|Names of the outputs used by the node to capture data from the operator invoked by the node. It either introduces a  value in the graph or refers to a graph output.|
-|op_type|string|The symbolic identifier of the operator, function, or external model to invoke.|
+|op_type|string|The symbolic identifier of the operator or external model to invoke.|
 |domain|string|The domain of the external model or the operator set that contains the operator named by the op_type property.|
 |attribute|Attribute[]|Named attributes, another form of operator parameterization, used for constant values rather than propagated values.|
 |doc_string|string|A human-readable documentation for this value. Markdown is allowed.|
