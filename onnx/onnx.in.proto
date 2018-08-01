@@ -81,7 +81,6 @@ enum Version {
   //    - Added functions
   //    - Added ONNX-ML types: records, tuples, scalar, 
   //      sparse tensors, opaque.
-  //    - Added type aliases
   IR_VERSION = 0x0000000000000004;
 // #else
   // IR VERSION 3 published on Nov 3, 2017
@@ -334,13 +333,6 @@ message ModelProto {
 
   // Named metadata values; keys should be distinct.
   repeated StringStringEntryProto metadata_props = 14;
-
-// #if ONNX-ML
-  // Aliased types, visible througout the document.
-  repeated TypeAliasProto type_aliases = 101;  
-
-  repeated ExternalModelProto external_models = 102;
-// #endif
 };
 
 // StringStringEntryProto follows the pattern for cross-proto-version maps.
@@ -349,17 +341,6 @@ message StringStringEntryProto {
   optional string key = 1;
   optional string value= 2;
 };
-
-// #if ONNX-ML
-// For space consideration, a type alias may be used to represent a type 
-// anywhere in a model document. Aliases are declared in the top-level model
-// and are visible throughout the document. The alias does not become part
-// of the type identity.
-message TypeAliasProto {
-  optional string    name = 1;   // namespace TypeAliases
-  optional TypeProto type = 2;
-};
-// #endif
 
 // Graphs
 //
@@ -602,12 +583,6 @@ message TypeProto {
     optional TypeProto value_type = 2;
   };
 
-  // A reference to a type alias declared in the ModelProto
-  message TypeReference {
-    // The alias for the type, namespace TypeAlias.
-    optional string name = 1;
-  };
-
 // #endif
 
   oneof value {
@@ -637,9 +612,7 @@ message TypeProto {
     
     Nullable nullable_type = 11; 
     
-    Scalar scalar_type = 12;     
-
-    TypeReference aliased_type = 13;
+    Scalar scalar_type = 12;
 
 // #endif
   }
@@ -663,21 +636,4 @@ message OperatorSetIdProto {
   // The version of the operator set being identified.
   // This field MUST be present in this version of the IR.
   optional int64 version = 2;
-}
-
-// External Models
-//
-// External models are uniquely identified by a (domain, name, opset_version) tuple. 
-//
-message ExternalModelProto {
-  // The domain of the operator set being identified.
-  // This field MUST be present in this version of the IR.
-  optional string domain = 1;
-
-  // The name of the model, that is, its main top-level graph.
-  optional string name = 2;
-
-  // The version of the model being identified.
-  // This field MUST be present in this version of the IR.
-  optional int64 version = 3;
 }
