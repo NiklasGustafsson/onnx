@@ -92,7 +92,7 @@ Models MUST specify a domain and use reverse domain names based on the responsib
  
 #### Model Composition
 
-External, explicitly imported, models may be treated as custom operators within other models. For such external model references to be resolved, each external model dependency MUST be declared in the 'external_models' set. External models are uniquely identified by their domain, the name of the main graph, and the model version. Model recursion is not supported, so model references must form acyclic graphs.
+External, explicitly imported, models may be treated as custom operators within other models. For such external model references to be resolved, each external model dependency MUST be declared in the 'external_models' set. External models are uniquely identified by their domain, the name of the main graph, and the model version. Model recursion is not supported, so model references must form acyclic graphs. For each unique (domain,name) combination in the list, there may only be one entry.
 
 How external models are found and loaded is implementation-defined.
 

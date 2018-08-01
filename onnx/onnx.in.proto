@@ -483,7 +483,7 @@ message OperatorSetIdProto {
 
 // External Models
 //
-// External models are uniquely identified by a (domain, name, opset_version) tuple. 
+// External models are uniquely identified by a (domain, name, version) tuple. 
 //
 message ExternalModelProto {
   // The domain of the operator set being identified.
