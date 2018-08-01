@@ -228,7 +228,6 @@ message ModelProto {
 
   // Named metadata values; keys should be distinct.
   repeated StringStringEntryProto metadata_props = 14;
-
 };
 
 // StringStringEntryProto follows the pattern for cross-proto-version maps.
@@ -237,7 +236,6 @@ message StringStringEntryProto {
   optional string key = 1;
   optional string value= 2;
 };
-
 
 // Graphs
 //
@@ -446,21 +444,4 @@ message OperatorSetIdProto {
   // The version of the operator set being identified.
   // This field MUST be present in this version of the IR.
   optional int64 version = 2;
-}
-
-// External Models
-//
-// External models are uniquely identified by a (domain, name, opset_version) tuple. 
-//
-message ExternalModelProto {
-  // The domain of the operator set being identified.
-  // This field MUST be present in this version of the IR.
-  optional string domain = 1;
-
-  // The name of the model, that is, its main top-level graph.
-  optional string name = 2;
-
-  // The version of the model being identified.
-  // This field MUST be present in this version of the IR.
-  optional int64 version = 3;
 }
