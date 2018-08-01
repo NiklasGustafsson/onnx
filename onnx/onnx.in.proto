@@ -184,13 +184,13 @@ message AttributeProto {
     repeated int64 dims = 1;
 
     // The data type of the tensor.
-    optional DataType data_type = 2;
+    optional TensorProto.DataType data_type = 2;
 
     oneof value {
 
-      YaleFormatTensor yale_format = 1;
+      YaleFormatTensor yale_format = 3;
 
-      OneHotTensor one_hot = 2;
+      OneHotTensor one_hot = 4;
     };
 };
 // #endif
