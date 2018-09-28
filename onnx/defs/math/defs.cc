@@ -44,12 +44,12 @@ The operator computes the {name} ({description}) values for each layer in the ba
 (batch_size x input_feature_dimensions). The output tensor has the same shape
 and contains the {name} values of the corresponding input.
 
-X does not need to explicitly be a 2D vector; rather, it will be
+Input does not need to explicitly be a 2D vector; rather, it will be
 coerced into one. For an arbitrary n-dimensional tensor
-X \in [a_0, a_1, ..., a_{k-1}, a_k, ..., a_{n-1}] and k is
-the axis provided, then X will be coerced into a 2-dimensional tensor with
+input \in [a_0, a_1, ..., a_{k-1}, a_k, ..., a_{n-1}] and k is
+the axis provided, then input will be coerced into a 2-dimensional tensor with
 dimensions [a_0 * ... * a_{k-1}, a_k * ... * a_{n-1}]. For the default
-case where axis=1, this means the X tensor will be coerced into a 2D tensor
+case where axis=1, this means the input tensor will be coerced into a 2D tensor
 of dimensions [a_0, a_1 * ... * a_{n-1}], where a_0 is often the batch size.
 In this situation, we must have a_0 = N and a_1 * ... * a_{n-1} = D.
 Each of these dimensions must be matched correctly, or else the operator
@@ -60,7 +60,7 @@ will throw errors.
     schema.SetDoc(doc);
     schema.Attr(
         "axis",
-        "(int) default to 1; describes the axis of the inputs when coerced "
+        "Describes the axis of the inputs when coerced "
         "to 2D; defaults to one because the 0th axis most likely describes "
         "the batch_size",
         AttributeProto::INT,
@@ -256,7 +256,7 @@ ONNX_OPERATOR_SET_SCHEMA(
     OpSchema()
         .Attr(
             "alpha",
-            "Coefficient of leakage default to 0.01.",
+            "Coefficient of leakage.",
             AttributeProto::FLOAT,
             0.01f)
         .SetDoc(LeakyRelu_ver6_doc)
@@ -313,7 +313,7 @@ ONNX_OPERATOR_SET_SCHEMA(
     OpSchema()
         .Attr(
             "alpha",
-            "Coefficient of ELU default to 1.0.",
+            "Coefficient of ELU.",
             AttributeProto::FLOAT,
             1.0f)
         .SetDoc(Elu_ver6_doc)
@@ -476,12 +476,12 @@ ONNX_OPERATOR_SET_SCHEMA(
     OpSchema()
         .Attr(
             "alpha",
-            "Value of alpha default to 0.2",
+            "Value of alpha.",
             AttributeProto::FLOAT,
             0.2f)
         .Attr(
             "beta",
-            "Value of beta default to 0.5",
+            "Value of beta.",
             AttributeProto::FLOAT,
             0.5f)
         .SetDoc(HardSigmoid_ver6_doc)
@@ -699,12 +699,12 @@ ONNX_OPERATOR_SET_SCHEMA(
             static_cast<int64_t>(0))
         .Attr(
             "alpha",
-            "Scalar multiplier for the product of input tensors A * B, and the default value is 1.0.",
+            "Scalar multiplier for the product of input tensors A * B.",
             AttributeProto::FLOAT,
             1.0f)
         .Attr(
             "beta",
-            "Scalar multiplier for input tensor C, and the default value is 1.0.",
+            "Scalar multiplier for input tensor C.",
             AttributeProto::FLOAT,
             1.0f)
         .TypeAndShapeInferenceFunction([](InferenceContext& ctx) {
@@ -867,8 +867,7 @@ ONNX_OPERATOR_SET_SCHEMA(
             true)
         .Attr(
             "axis",
-            "Dimension on which to do the sort. Default -1, which indicates the last"
-            " axis",
+            "Dimension on which to do the sort.",
             AttributeProto::INT,
             static_cast<int64_t>(-1))
         .TypeAndShapeInferenceFunction([](InferenceContext& ctx) {

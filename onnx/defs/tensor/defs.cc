@@ -300,6 +300,9 @@ ONNX_OPERATOR_SET_SCHEMA(
             fail_shape_inference("Required attribute axis is missing");
           }
           int axis = static_cast<int>(axisAttr->i());
+          if (rank <= axis) {
+            fail_shape_inference("rank must be greater than axis");
+          }
           if (axis < 0) {
             return; // TODO: check if negative axis must be supported
           }
@@ -367,7 +370,7 @@ ONNX_OPERATOR_SET_SCHEMA(
             "Constrain input and output types to all tensor types.")
         .Attr(
             "axis",
-            "Which axis to split on (defaults to 0)",
+            "Which axis to split on.",
             AttributeProto::INT,
             static_cast<int64_t>(0))
         .Attr("split", "length of each output", AttributeProto::INTS, OPTIONAL)
@@ -657,7 +660,7 @@ ONNX_OPERATOR_SET_SCHEMA(
         .SetDoc(Gather_ver1_doc)
         .Attr(
             "axis",
-            "Which axis to gather on, defaults to 0. Negative value means "
+            "Which axis to gather on. Negative value means "
             "counting dimensions from the back. Accepted range in [-r, r-1]",
             AttributeProto::INT,
             static_cast<int64_t>(0))
@@ -865,7 +868,7 @@ ONNX_OPERATOR_SET_SCHEMA(
             std::string("constant"))
         .Attr(
             "value",
-            "One float, indicates the value to be filled, default is 0",
+            "One float, indicates the value to be filled.",
             AttributeProto::FLOAT,
             0.0f)
         .SetDoc(Pad_ver2_doc)

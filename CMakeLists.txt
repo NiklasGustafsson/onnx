@@ -23,8 +23,7 @@ option(ONNX_WERROR "Build with Werror" OFF)
 option(ONNX_COVERAGE "Build with coverage instrumentation" OFF)
 option(ONNX_BUILD_TESTS "Build ONNX C++ APIs Tests" OFF)
 option(ONNX_USE_LITE_PROTO "Use lite protobuf instead of full." OFF)
-
-set(ONNX_NAMESPACE "onnx" CACHE STRING "onnx namespace")
+option(ONNXIFI_DUMMY_BACKEND "Use dummy backend in onnxifi test driver." OFF)
 
 # Set C++11 as standard for the whole project
 if(NOT MSVC)
@@ -44,6 +43,10 @@ if(NOT MSVC)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-arcs -ftest-coverage")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
   endif()
+endif()
+
+if(NOT ONNX_NAMESPACE)
+  set(ONNX_NAMESPACE "onnx")
 endif()
 
 if(ONNX_BUILD_TESTS)
@@ -117,11 +120,8 @@ function(RELATIVE_PROTOBUF_GENERATE_CPP NAME SRCS HDRS ROOT_DIR DEPEND)
     return()
   endif()
 
-  if(MSVC AND BUILD_SHARED_LIBS)
-    set(ONNX_DLLEXPORT_STR "dllexport_decl=ONNX_API:")
-  else()
-    set(ONNX_DLLEXPORT_STR "")
-  endif()
+  # Add ONNX_API prefix to protobuf classes and methods in all cases
+  set(ONNX_DLLEXPORT_STR "dllexport_decl=ONNX_API:")
 
   set(${SRCS})
   set(${HDRS})
@@ -245,32 +245,48 @@ function(RELATIVE_PROTOBUF_GENERATE_CPP NAME SRCS HDRS ROOT_DIR DEPEND)
 endfunction()
 
 relative_protobuf_generate_cpp(gen_onnx_proto
-                               PROTO_SRCS
-                               PROTO_HDRS
+                               __tmp_srcs
+                               __tmp_hdrs
                                ${ONNX_ROOT}
                                ""
                                onnx/onnx.in.proto)
+list(APPEND ONNX_PROTO_SRCS ${__tmp_srcs})
+list(APPEND ONNX_PROTO_HDRS ${__tmp_hdrs})
+
 relative_protobuf_generate_cpp(gen_onnx_operators_proto
-                               PROTO_SRCS2
-                               PROTO_HDRS2
+                               __tmp_srcs
+                               __tmp_hdrs
                                ${ONNX_ROOT}
                                gen_onnx_proto
                                onnx/onnx-operators.in.proto)
-list(APPEND PROTO_SRCS ${PROTO_SRCS2})
-list(APPEND PROTO_HDRS ${PROTO_HDRS2})
+list(APPEND ONNX_PROTO_SRCS ${__tmp_srcs})
+list(APPEND ONNX_PROTO_HDRS ${__tmp_hdrs})
 
-file(GLOB_RECURSE onnx_src "${ONNX_ROOT}/onnx/*.h" "${ONNX_ROOT}/onnx/*.cc")
+file(GLOB_RECURSE __tmp_srcs "${ONNX_ROOT}/onnx/*.h" "${ONNX_ROOT}/onnx/*.cc")
 file(GLOB_RECURSE onnx_gtests_src "${ONNX_ROOT}/onnx/test/cpp/*.h"
-                  "${ONNX_ROOT}/onnx/test/cpp/*.cc")
-list(REMOVE_ITEM onnx_src "${ONNX_ROOT}/onnx/cpp2py_export.cc")
-list(REMOVE_ITEM onnx_src ${onnx_gtests_src})
+	"${ONNX_ROOT}/onnx/test/cpp/*.cc"
+	"${ONNX_ROOT}/onnx/backend/test/cpp/*.cc"
+	"${ONNX_ROOT}/onnx/backend/test/cpp/*.h")
+list(REMOVE_ITEM __tmp_srcs "${ONNX_ROOT}/onnx/cpp2py_export.cc")
+list(REMOVE_ITEM __tmp_srcs ${onnx_gtests_src})
+list(APPEND ONNX_SRCS ${__tmp_srcs})
 
-add_library(onnx_proto ${PROTO_SRCS} ${PROTO_HDRS})
+add_library(onnx_proto ${ONNX_PROTO_SRCS} ${ONNX_PROTO_HDRS})
 target_include_directories(onnx_proto PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
   $<INSTALL_INTERFACE:include>
   ${PROTOBUF_INCLUDE_DIRS})
 
+if (MSVC)
+  if (BUILD_SHARED_LIBS OR ONNX_BUILD_MAIN_LIB)
+    set(ONNX_API_DEFINE "-DONNX_API=__declspec(dllexport)")
+  else()
+    set(ONNX_API_DEFINE "-DONNX_API=")
+  endif()
+else()
+  set(ONNX_API_DEFINE "-DONNX_API=")
+endif()
+target_compile_definitions(onnx_proto PRIVATE ${ONNX_API_DEFINE})
 
 if(ONNX_USE_LITE_PROTO)
   if(TARGET protobuf::libprotobuf-lite)
@@ -287,7 +303,7 @@ else()
 endif()
 add_onnx_global_defines(onnx_proto)
 
-add_library(onnx ${onnx_src})
+add_library(onnx ${ONNX_SRCS})
 target_include_directories(onnx PUBLIC
   $<BUILD_INTERFACE:${ONNX_ROOT}>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -345,6 +361,8 @@ if(BUILD_ONNX_PYTHON)
     target_link_libraries(onnx_cpp2py_export
                           PRIVATE "-Wl,--whole-archive" $<TARGET_FILE:onnx>
                                   "-Wl,--no-whole-archive")
+    set_target_properties(onnx_cpp2py_export
+                          PROPERTIES LINK_FLAGS "-Wl,--exclude-libs,ALL")
   endif()
 
   target_link_libraries(onnx_cpp2py_export PRIVATE onnx)
@@ -556,7 +574,9 @@ if(NOT ANDROID AND NOT IOS)
   install(TARGETS onnxifi_wrapper
     EXPORT ONNXTargets DESTINATION lib)
 endif()
-
+if(ONNXIFI_DUMMY_BACKEND)
+  add_definitions(-DONNXIFI_DUMMY_BACKEND=1)
+endif()
 if(ONNX_BUILD_TESTS)
   include(${ONNX_ROOT}/cmake/unittest.cmake)
 endif()
